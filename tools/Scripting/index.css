@@ -1,0 +1,76 @@
+head {
+	margin: 0;
+}
+body, html {
+	margin: 0;
+	height: 100%;
+	font-family: Calibri Light;
+	font-size: 15px;
+}
+header {
+	position: absolute;
+	top: 0; left: 0;
+	background-color: #cecece;
+	width: 100%;
+	height: 30px;
+}
+div#blocklist {
+	position: absolute;
+	display: inline-block;
+	height: calc(100% - 30px);
+	width: 250px;
+	top: 30px; left: 0;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	direction: rtl;
+}
+div#blocklist * {
+	direction: ltr;
+}
+div#blocklist::-webkit-scrollbar, div#scriptview::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+	background-color: #efefef;
+}
+div#blocklist::-webkit-scrollbar-thumb, div#scriptview::-webkit-scrollbar-thumb {
+	background-color: #7c7c7c;
+}
+block-picklist {
+	height: initial;
+}
+div#scriptview {
+	position: absolute;
+	display: inline-block;
+	width: calc(100% - 250px);
+	height: calc(100% - 30px);
+	top: 30px; left: 250px;
+	overflow-y: scroll;
+	overflow-x: scroll;
+}
+button {
+	font-family: monospace;
+	border: 1px solid #efefef;
+	background-color: #ffffff;
+	border-radius: 5px;
+	padding: 5px 12px;
+}
+button.red {
+	background-color: #ffcece;
+	border: 1px solid #ffacac;
+}
+button.aqua {
+	background-color: #ccffff;
+	border: 1px solid #8be6ff;
+}
+
+img#blockremove {
+	position: absolute;
+	top: calc(100% - 75px);
+	left: calc(100% - 75px);
+	display: none;
+	width: 50px;
+	height: 50px;
+}
+img#blockremove.visible {
+	display: block;
+}

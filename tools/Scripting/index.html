@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>nahkdAPI - Scripting</title>
+	<link rel="stylesheet" type="text/css" href="simpleblok-nahkd-ish.css">
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<script type="text/javascript" src="simpleblok.js"></script>
+	<script type="text/javascript" src="quicksel.js"></script>
+</head>
+<body>
+	<header>
+		<button id="toyaml" style="margin-top: 1px; margin-left: 5px;" onclick="convertToYaml()">Convert to YAML</button>
+		<button id="toyaml" style="margin-top: 1px; margin-left: 5px;">Clear</button>
+		<textarea id="yamlarea" style="height: calc(2ch - 2px); resize: none;" placeholder="YAML Output" onclick="this.select()" readonly></textarea>
+	</header>
+	<div id="hidden" style="display: none;"></div>
+	<div id="blocklist"></div><div id="scriptview"></div><img id="blockremove" src="icon_remove.png">
+	<script type="text/javascript">
+		// Making example blocks
+		var Blocks = {
+			Variables: {
+				SetString: SimpleBlok.createBlock("variables-setstring",
+					"path", SimpleBlok.FieldType.Text, "path.to.variable",
+					"label", SimpleBlok.FieldType.Label, " = '",
+					"text", SimpleBlok.FieldType.Text, "Insert Text Here",
+					"label", SimpleBlok.FieldType.Label, "'",
+					),
+				SetNumber: SimpleBlok.createBlock("variables-setnumber",
+					"path", SimpleBlok.FieldType.Text, "path.to.variable",
+					"label", SimpleBlok.FieldType.Label, " = ",
+					"text", SimpleBlok.FieldType.Text, "0.0"
+					),
+				IncreasesNumber: SimpleBlok.createBlock("variables-increasesnumber",
+					"path", SimpleBlok.FieldType.Text, "path.to.variable",
+					"label", SimpleBlok.FieldType.Label, " += ",
+					"text", SimpleBlok.FieldType.Text, "1.0"
+					),
+				Remove: SimpleBlok.createBlock("variables-remove",
+					"path", SimpleBlok.FieldType.Text, "path.to.variable",
+					"label", SimpleBlok.FieldType.Label, " => Remove "
+					)
+			},
+			Player: {
+				Message: SimpleBlok.createBlock("player-sendMessage",
+					"label", SimpleBlok.FieldType.Label, "Send message",
+					"message", SimpleBlok.FieldType.Text, "Hello %player_name%"
+					),
+				AddItemMaterial: SimpleBlok.createBlock("player-addItem",
+					"label", SimpleBlok.FieldType.Label, "Add item",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "Material",
+					"material", SimpleBlok.FieldType.Text, "PAPER",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "Amount",
+					"amount", SimpleBlok.FieldType.Text, "1",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "Damage Value",
+					"damage", SimpleBlok.FieldType.Text, "0",
+					),
+				AddItemWithMeta: SimpleBlok.createBlock("player-addItemMeta",
+					"label", SimpleBlok.FieldType.Label, "Add item with meta",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "Material",
+					"material", SimpleBlok.FieldType.Text, "PAPER",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "Amount",
+					"amount", SimpleBlok.FieldType.Text, "1",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "Damage Value",
+					"damage", SimpleBlok.FieldType.Text, "0",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "Localized Name",
+					"locname", SimpleBlok.FieldType.Text, "§dCursed Spell",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "Display Name",
+					"locname", SimpleBlok.FieldType.Text, "§dSpell of Fire",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "Lore",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"locname", SimpleBlok.FieldType.TextList, ["ok", "fine"],
+					)
+			},
+			Economy: {
+				Give: SimpleBlok.createBlock("vault-give",
+					"label", SimpleBlok.FieldType.Label, "Give $",
+					"amount", SimpleBlok.FieldType.Text, "0.0",
+					"label", SimpleBlok.FieldType.Label, "to player",
+					),
+				Take: SimpleBlok.createBlock("vault-take",
+					"label", SimpleBlok.FieldType.Label, "Take $",
+					"amount", SimpleBlok.FieldType.Text, "0.0",
+					"label", SimpleBlok.FieldType.Label, "from player",
+					)
+			},
+			Conditional: {
+				If: SimpleBlok.createBlock("conditional-if",
+					"label", SimpleBlok.FieldType.Label, "If",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"message", SimpleBlok.FieldType.Conditions, [
+						{type: '==', input1: '%player:name%', input2: '%player:display_name%'},
+						{type: '==', input1: '%player:name%', input2: '%player:display_name%'}
+					],
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "then",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"block", SimpleBlok.FieldType.ChildBlocks, SimpleBlok.createScript(),
+					),
+				IfElse: SimpleBlok.createBlock("conditional-if-else",
+					"label", SimpleBlok.FieldType.Label, "If",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"message", SimpleBlok.FieldType.Conditions, [
+						{type: '==', input1: '%player:name%', input2: '%player:display_name%'},
+						{type: '==', input1: '%player:name%', input2: '%player:display_name%'}
+					],
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "then",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"block", SimpleBlok.FieldType.ChildBlocks, SimpleBlok.createScript(),
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "else",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"block", SimpleBlok.FieldType.ChildBlocks, SimpleBlok.createScript(),
+					),
+			},
+			Miscs: {
+				RunCommandAsPlayer: SimpleBlok.createBlock("command-asplayer",
+					"label", SimpleBlok.FieldType.Label, "Run command /",
+					"nel", SimpleBlok.FieldType.Text, "me I'm good",
+					"label", SimpleBlok.FieldType.Label, "as player",
+					),
+				RunCommandAsConsole: SimpleBlok.createBlock("command-asconsole",
+					"label", SimpleBlok.FieldType.Label, "Run command /",
+					"nel", SimpleBlok.FieldType.Text, "tellraw @a {\"text\": \"Hello everyone\"}",
+					"label", SimpleBlok.FieldType.Label, "as console",
+					)
+			}
+		}
+
+		var Runtime = {
+			Scripts: [],
+			SelectedScript: -1,
+			Temporary: {
+				BlockToSwap: null,
+				YamlOutputSpaces: 0
+			}
+		}
+
+		// Add example script
+		;(function(){
+			var ex = SimpleBlok.createScript();
+			Runtime.Scripts.push(ex);
+			Runtime.SelectedScript = 0;
+		})();
+
+		// Functions
+		function init() {
+			var scriptView = document.querySelector("div#scriptview");
+			var svelement = SimpleBlok.toElement(Runtime.Scripts[Runtime.SelectedScript]);
+			scriptView.innerHTML = svelement.outerHTML;
+			var blockPicker = document.querySelector("div#blocklist");
+			blockPicker.innerHTML = SimpleBlok.toBlockList(Blocks).outerHTML;
+		}
+		function addDefault() {
+			var scriptView = document.querySelector("block-script");
+			for (var i = 0; i < scriptView.children.length; i++) {
+				if (scriptView.children[i].tagName === "BLOCK-DRAG") {
+					scriptView.children[i].addEventListener('dragstart', SimpleBlok.eventHandlers.onBlockDrag);
+					scriptView.children[i].addEventListener('dragenter', SimpleBlok.eventHandlers.onBlockDragenter);
+					scriptView.children[i].addEventListener('dragleave', SimpleBlok.eventHandlers.onBlockDragleave);
+					scriptView.children[i].addEventListener('dragover', SimpleBlok.eventHandlers.onBlockDragover);
+					scriptView.children[i].addEventListener('drop', SimpleBlok.eventHandlers.onBlockDrop);
+				}
+			}
+			var blockPicker = document.querySelector("block-picklist");
+			for (var i = 0; i < blockPicker.children.length; i++) {
+				var el = blockPicker.children[i];
+				if (el.tagName === "BLOCK-DRAG") {
+					el.addEventListener('dragstart', SimpleBlok.eventHandlers.onBlockCopyDrag);
+				}
+			}
+			updateEvents();
+		}
+		function convertToYaml() {
+			var scriptView = document.querySelector("div#scriptview");
+			var yamlOutput = document.querySelector("textarea#yamlarea");
+			yamlOutput.value = "";
+			var scriptElement = scriptView.children[0];
+			var script = SimpleBlok.convertToScript(scriptElement);
+			console.log(script);
+			script.blocks.forEach((b, i) => {
+				yamlOutput.value += convertBlockToYaml(b, i);
+			});
+		}
+		function createSpace(length) {
+			var a = "";
+			for (var i = 0; i < length; i++) a += " ";
+			return a;
+		}
+		function convertBlockToYaml(block, index) {
+			var output = "";
+			var baseSpaces = createSpace(Runtime.Temporary.YamlOutputSpaces);
+			if (block.id === "player-sendMessage") {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Player'\n`
+				+ `${baseSpaces}  type: 'Message'\n`
+				+ `${baseSpaces}  message: ${block.fields[1].value}\n`;
+			} else if (block.id.startsWith("conditional-if")) {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Conditional'\n`
+				+ `${baseSpaces}  conditions:\n`;
+				block.fields[2].value.forEach((e, i) => {
+					output += ``
+					+ `${baseSpaces}    condition-${i}:\n`
+					+ `${baseSpaces}      type: '${e.type}'\n`
+					+ `${baseSpaces}      input1: ${e.input1}\n`
+					+ `${baseSpaces}      input2: ${e.input2}\n`;
+				});
+				output += ``
+				+ `${baseSpaces}  children:\n`;
+				Runtime.Temporary.YamlOutputSpaces += 4;
+				block.fields[6].value.blocks.forEach((b, i) => {
+					output += convertBlockToYaml(b, i);
+				});
+				Runtime.Temporary.YamlOutputSpaces -= 4;
+			} else if (block.id === 'player-addItem') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Player'\n`
+				+ `${baseSpaces}  type: 'AddItem'\n`
+				+ `${baseSpaces}  material: '${block.fields[3].value}'\n`;
+				if (block.fields[6].value !== "") output += `${baseSpaces}  amount: ${block.fields[6].value}\n`;
+				if (block.fields[9].value !== "") output += `${baseSpaces}  datavalue: ${block.fields[9].value}\n`;
+			} else if (block.id === 'player-addItemMeta') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Player'\n`
+				+ `${baseSpaces}  type: 'AddItem'\n`
+				+ `${baseSpaces}  material: '${block.fields[3].value}'\n`;
+				if (block.fields[6].value !== "") output += `${baseSpaces}  amount: ${block.fields[6].value}\n`;
+				if (block.fields[9].value !== "") output += `${baseSpaces}  datavalue: ${block.fields[9].value}\n`;
+				output += `${baseSpaces}  meta:\n`;
+				if (block.fields[12].value !== "") output += `${baseSpaces}    localizedName: ${block.fields[12].value}\n`;
+				if (block.fields[15].value !== "") output += `${baseSpaces}    name: ${block.fields[15].value}\n`;
+				if (!__.emptyStringArray(block.fields[19].value)) {
+					output += `${baseSpaces}    lore:\n`;
+					block.fields[19].value.forEach(e => {
+						output += `${baseSpaces}    - '${e}'\n`;
+					});
+				}
+			} else if (block.id === 'variables-setstring') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Variable'\n`
+				+ `${baseSpaces}  type: 'Set String'\n`
+				+ `${baseSpaces}  path: '${block.fields[0].value}'\n`
+				+ `${baseSpaces}  value: '${block.fields[2].value}'\n`;
+			} else if (block.id === 'variables-setnumber') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Variable'\n`
+				+ `${baseSpaces}  type: 'Set Number'\n`
+				+ `${baseSpaces}  path: '${block.fields[0].value}'\n`
+				+ `${baseSpaces}  value: ${block.fields[2].value}\n`;
+			} else if (block.id === 'variables-increasesnumber') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Variable'\n`
+				+ `${baseSpaces}  type: 'Increases'\n`
+				+ `${baseSpaces}  path: '${block.fields[0].value}'\n`
+				+ `${baseSpaces}  value: ${block.fields[2].value}\n`;
+			} else if (block.id === 'variables-remove') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Variable'\n`
+				+ `${baseSpaces}  type: 'Remove'\n`
+				+ `${baseSpaces}  path: '${block.fields[0].value}'\n`;
+			} else if (block.id === 'vault-give') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Vault'\n`
+				+ `${baseSpaces}  type: 'Give'\n`
+				+ `${baseSpaces}  amount: ${block.fields[1].value}\n`;
+			} else if (block.id === 'vault-take') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Vault'\n`
+				+ `${baseSpaces}  type: 'Take'\n`
+				+ `${baseSpaces}  amount: ${block.fields[1].value}\n`;
+			} else if (block.id === 'command-asplayer') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Commands'\n`
+				+ `${baseSpaces}  type: 'Player'\n`
+				+ `${baseSpaces}  command: ${block.fields[1].value}\n`;
+			} else if (block.id === 'command-asconsole') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Commands'\n`
+				+ `${baseSpaces}  type: 'Console'\n`
+				+ `${baseSpaces}  command: ${block.fields[1].value}\n`;
+			}
+			if (block.id === "conditional-if-else") {
+				output += ``
+				+ `${baseSpaces}  children-else:\n`;
+				Runtime.Temporary.YamlOutputSpaces += 4;
+				block.fields[6].value.blocks.forEach((b, i) => {
+					output += convertBlockToYaml(b, i);
+				});
+				Runtime.Temporary.YamlOutputSpaces -= 4;
+			}
+			//console.log(output);
+			return output;
+		}
+
+		function swapElements(obj1, obj2) {
+			// create marker element and insert it where obj1 is
+			var temp = document.createElement("div");
+			obj1.parentNode.insertBefore(temp, obj1);
+
+			// move obj1 to right before obj2
+			obj2.parentNode.insertBefore(obj1, obj2);
+
+			// move obj2 to right before where obj1 used to be
+			temp.parentNode.insertBefore(obj2, temp);
+
+			// remove temporary marker node
+			temp.parentNode.removeChild(temp);
+		}
+
+		function updateEvents() {
+			var blockDragnew = document.querySelectorAll("block-dragnew");
+			for (var i = 0; i < blockDragnew.length; i++) {
+				blockDragnew[i].ondragover = function(event) {
+					event.target.classList.add("dragover");
+					event.preventDefault();
+				}
+				blockDragnew[i].ondragleave = function(event) {
+					event.target.classList.add("dragover");
+					event.target.classList.remove("dragover");
+					event.preventDefault();
+				}
+				blockDragnew[i].ondrop = function(event) {
+					event.stopPropagation();
+					var clone = Runtime.Temporary.BlockToSwap.cloneNode(true);
+					event.target.parentNode.insertBefore(clone, event.target);
+					clone.addEventListener('dragstart', SimpleBlok.eventHandlers.onBlockDrag);
+					clone.addEventListener('dragenter', SimpleBlok.eventHandlers.onBlockDragenter);
+					clone.addEventListener('dragleave', SimpleBlok.eventHandlers.onBlockDragleave);
+					clone.addEventListener('dragover', SimpleBlok.eventHandlers.onBlockDragover);
+					clone.addEventListener('drop', SimpleBlok.eventHandlers.onBlockDrop);
+					updateEvents();
+				}
+			}
+		}
+
+		// Apply event
+		SimpleBlok.eventHandlers.onBlockDrag = function(event) {
+			Runtime.Temporary.BlockToSwap = event.target;
+			document.querySelector("img#blockremove").classList.add("visible");
+		}
+		SimpleBlok.eventHandlers.onBlockCopyDrag = function(event) {
+			var clone = event.target.cloneNode(true);
+			document.querySelector("div#hidden").innerHTML = "";
+			document.querySelector("div#hidden").appendChild(clone);
+			clone.addEventListener('dragstart', SimpleBlok.eventHandlers.onBlockDrag);
+			clone.addEventListener('dragenter', SimpleBlok.eventHandlers.onBlockDragenter);
+			clone.addEventListener('dragleave', SimpleBlok.eventHandlers.onBlockDragleave);
+			clone.addEventListener('dragover', SimpleBlok.eventHandlers.onBlockDragover);
+			clone.addEventListener('drop', SimpleBlok.eventHandlers.onBlockDrop);
+			Runtime.Temporary.BlockToSwap = clone;
+		}
+		SimpleBlok.eventHandlers.onBlockDrop = function(event) {
+			var element = _(event.target).query.parentTagName("block-drag");
+			swapElements(Runtime.Temporary.BlockToSwap, element);
+		}
+		SimpleBlok.eventHandlers.onBlockDragover = function(event) {
+			var element = _(event.target).query.parentTagName("block-drag");
+			if (element.tagName === "BLOCK-DRAG") {
+				element.classList.add("dragover");
+				event.preventDefault();
+			}
+		}
+		SimpleBlok.eventHandlers.onBlockDragleave = function(event) {
+			var element = _(event.target).query.parentTagName("block-drag");
+			if (element.tagName === "BLOCK-DRAG") {
+				element.classList.add("dragover");
+				element.classList.remove("dragover");
+			}
+			event.preventDefault();
+		}
+		SimpleBlok.eventHandlers.onBlockDragenter = function(event) {
+			event.preventDefault();
+		}
+		document.addEventListener('dragover', (e) => {e.preventDefault();});
+		document.addEventListener('drop', (e) => {
+			document.querySelector("img#blockremove").classList.remove("visible");
+		});
+		document.querySelector("img#blockremove").addEventListener('drop', (e) => {
+			Runtime.Temporary.BlockToSwap.remove();
+		});
+		document.addEventListener('click', (e) => {
+			if (e.target.classList.contains('deletebutton-condition')) {
+				e.target.parentNode.remove();
+			} else if (e.target.classList.contains("addbutton-condition")) {
+				var conditionsContainer = e.target.parentNode;
+
+				var listEntry = document.createElement("list-entry-condition");
+				listEntry.innerHTML = ``
+				+ `<inputbox contenteditable>input1</inputbox><inputbox contenteditable>==</inputbox><inputbox contenteditable>input2</inputbox>`;
+				var deleteButton = document.createElement("button");
+				deleteButton.classList.add("red");
+				deleteButton.classList.add("deletebutton-condition");
+				deleteButton.innerHTML = "x";
+				listEntry.appendChild(deleteButton);
+				conditionsContainer.insertBefore(listEntry, e.target);
+			}
+		});
+
+		// Update
+		init();
+		addDefault();
+		convertToYaml();
+	</script>
+</body>
+</html>

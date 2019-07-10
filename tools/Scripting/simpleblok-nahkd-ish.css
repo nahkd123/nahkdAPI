@@ -1,0 +1,100 @@
+block-script {
+	font-family: monospace;
+	font-size: 12px;
+	padding: 5px 12px;
+	display: block;
+	position: relative;
+	user-select: none;
+}
+block-script block-drag {
+	padding: 5px 12px;
+	display: block;
+	background-color: #efefef;
+	border-radius: 5px;
+	width: fit-content;
+	margin-bottom: 1px;
+}
+block-script block-field {
+	padding: 5px 6px;
+	display: inline-block;
+	border-radius: 5px;
+}
+block-script block-field.editable, inputbox {
+	background-color: white;
+	padding: 5px 12px;
+	border-radius: 5px;
+}
+block-script block-dragnew {
+	padding: 5px 12px;
+	display: block;
+	background-color: white;
+	border: 1px dashed black;
+	border-radius: 5px;
+	width: fit-content;
+}
+
+block-picklist {
+	display: inline-block;
+	font-family: monospace;
+	font-size: 12px;
+	padding: 5px 12px;
+	background-color: #efefef;
+}
+block-picklist h1 {
+	margin: 0;
+	font-size: 15px;
+	text-transform: uppercase;
+	font-weight: lighter;
+	font-family: Calibri Light;
+	padding: 5px 12px;
+	user-select: none;
+}
+block-picklist block-drag {
+	padding: 5px 12px;
+	display: block;
+	background-color: #cecece;
+	border-radius: 5px;
+	width: fit-content;
+	margin-bottom: 5px;
+	user-select: none;
+}
+block-picklist block-field {
+	padding: 5px 6px;
+	display: inline-block;
+	border-radius: 5px;
+}
+block-picklist block-field.editable {
+	background-color: white;
+	padding: 5px 12px;
+	border-radius: 5px;
+}
+
+block-drag.dragover, block-dragnew.dragover, block-drag.source {
+	box-shadow: 0px 0px 0px 1px #4bcce6;
+}
+block-field.label {
+	cursor: move;
+}
+block-field.conditionslist {
+	background-color: #acacac;
+	display: block;
+	padding: 5px 12px;
+	border-radius: 5px;
+}
+block-field.list {
+	background-color: white;
+	width: -webkit-fill-available;
+}
+list-entry-condition {
+	display: block;
+}
+inputbox {
+	display: inline-block;
+	margin-left: 12px;
+}
+block-field.childblocks {
+	background-color: white;
+}
+list-entry {
+	display: block;
+}
