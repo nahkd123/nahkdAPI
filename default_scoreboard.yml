@@ -1,0 +1,53 @@
+title:
+  '0':
+    type: text
+    input: '§bnahkdAPI §3Scoreboard'
+    children: null
+content:
+  '0':
+    '0':
+      type: animated
+      animations:
+      - 'rainbow'
+      input: '+==========================+'
+      children: null
+  '1':
+    '0':
+      type: text
+      input: '§7§oWelcome §f§o%player:name%'
+      children: null
+  '2':
+    '0':
+      type: text
+      input: '§7§oto our server!'
+      children: null
+  '3':
+    '0':
+      type: empty
+  '4':
+    '0':
+      type: text
+      input: '§7§oMake sure to edit this'
+      children: null
+  '5':
+    '0':
+      type: text
+      input: '§7§oboard in '
+      children: null
+    '1':
+      type: animated
+      animations:
+      - 'rainbow'
+      input: 'config'
+      children: null
+    '2':
+      type: text
+      input: ' §7§ofile!'
+      children: null
+  '6':
+    '0':
+      type: animated
+      animations:
+      - 'rainbow'
+      input: '+==========================+'
+      children: null

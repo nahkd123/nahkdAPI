@@ -1,0 +1,40 @@
+name: nahkdAPI
+author: nahkd123
+version: 1.0.0
+main: me.nahkd.spigot.apimain.nahkdAPIPlugin
+softdepend: [Vault]
+
+commands:
+  timings2:
+    description: nahkdAPI timings version
+    usage: /timings2 to toggle timings
+    permission: 'nahkdapi.timings'
+  nahkdapi:
+    description: nahkdAPI main command
+    usage: /nahkdapi
+    permission: 'nahkdapi.special.main'
+  variable:
+    description: Variable for automation usage
+    usage: /variable
+    permission: 'nahkdapi.special.variables'
+
+permissions:
+  nahkdapi.timings:
+    description: Use TPS timings from nahkdAPI to identify problems
+    default: op
+  nahkdapi.special.*:
+    description: Special permission
+    default: op
+    children:
+      nahkdapi.special.reload: true
+      nahkdapi.special.main: true
+      nahkdapi.special.variables: true
+  nahkdapi.special.reload:
+    description: Reload plugin
+    default: false
+  nahkdapi.special.main:
+    description: Use main command
+    default: false
+  nahkdapi.special.variables:
+    description: Use variables for automation
+    default: false

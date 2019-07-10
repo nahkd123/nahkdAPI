@@ -1,0 +1,21 @@
+# Scoreboard
+scoreboard:
+  # Default is disabled
+  enabled: false
+  
+  # Default scoreboard file
+  default: scoreboard.yml
+  
+  # Ticking speed. Default 1. For better performance, increase this number, but don't put it over 20 ticks
+  ticking: 2
+
+# Placeholder
+placeholders:
+  # Default is enabled
+  enabled: true
+
+  # The custom placeholder. Use this for something you've grabbed online.
+  custom:
+    server_info:
+      name: 'YourServerName'
+      ip: 'localhost'
