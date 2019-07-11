@@ -11,6 +11,7 @@
 	<header>
 		<button id="toyaml" style="margin-top: 1px; margin-left: 5px;" onclick="convertToYaml()">Convert to YAML</button>
 		<button id="toyaml" style="margin-top: 1px; margin-left: 5px;">Clear</button>
+		<button id="help" style="margin-top: 1px; margin-left: 5px;" onclick="this.innerText = 'Comming soon'">?</button>
 		<textarea id="yamlarea" style="height: calc(2ch - 2px); resize: none;" placeholder="YAML Output" onclick="this.select()" readonly></textarea>
 	</header>
 	<div id="hidden" style="display: none;"></div>
@@ -38,6 +39,13 @@
 				Remove: SimpleBlok.createBlock("variables-remove",
 					"path", SimpleBlok.FieldType.Text, "path.to.variable",
 					"label", SimpleBlok.FieldType.Label, " => Remove "
+					),
+				SetLocalString: SimpleBlok.createBlock("variables-setstringlocal",
+					"label", SimpleBlok.FieldType.Label, "local: ",
+					"path", SimpleBlok.FieldType.Text, "path.to.variable",
+					"label", SimpleBlok.FieldType.Label, " = '",
+					"text", SimpleBlok.FieldType.Text, "Insert Text Here",
+					"label", SimpleBlok.FieldType.Label, "'",
 					)
 			},
 			Player: {
@@ -78,6 +86,14 @@
 					"label", SimpleBlok.FieldType.Label, "Lore",
 					"nel", SimpleBlok.FieldType.Newline, "",
 					"locname", SimpleBlok.FieldType.TextList, ["ok", "fine"],
+					)
+			},
+			Entity: {
+				SetVector: SimpleBlok.createBlock("entity-setVector",
+					"label", SimpleBlok.FieldType.Label, "Set vector to",
+					"x", SimpleBlok.FieldType.Text, "0.0",
+					"y", SimpleBlok.FieldType.Text, "0.0",
+					"z", SimpleBlok.FieldType.Text, "0.0",
 					)
 			},
 			Economy: {
@@ -122,6 +138,45 @@
 					"block", SimpleBlok.FieldType.ChildBlocks, SimpleBlok.createScript(),
 					),
 			},
+			Loops: {
+				ForLoop1: SimpleBlok.createBlock("loop-for-1",
+					"label", SimpleBlok.FieldType.Label, "Loop from",
+					"start", SimpleBlok.FieldType.Text, "0.0",
+					"label", SimpleBlok.FieldType.Label, "=>",
+					"end", SimpleBlok.FieldType.Text, "5.0",
+					"label", SimpleBlok.FieldType.Label, "to variable",
+					"end", SimpleBlok.FieldType.Text, "i",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"block", SimpleBlok.FieldType.ChildBlocks, SimpleBlok.createScript(),
+					),
+				EntitiesRange: SimpleBlok.createBlock("loop-entities",
+					"label", SimpleBlok.FieldType.Label, "Loop to entities in range",
+					"x", SimpleBlok.FieldType.Text, "1.0",
+					"y", SimpleBlok.FieldType.Text, "1.0",
+					"z", SimpleBlok.FieldType.Text, "1.0",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "to variable",
+					"end", SimpleBlok.FieldType.Text, "i",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"block", SimpleBlok.FieldType.ChildBlocks, SimpleBlok.createScript(),
+					),
+				EntitiesRangeLocation: SimpleBlok.createBlock("loop-entitiesrange",
+					"label", SimpleBlok.FieldType.Label, "Loop to entities in range",
+					"x", SimpleBlok.FieldType.Text, "1.0",
+					"y", SimpleBlok.FieldType.Text, "1.0",
+					"z", SimpleBlok.FieldType.Text, "1.0",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "at",
+					"x", SimpleBlok.FieldType.Text, "0",
+					"y", SimpleBlok.FieldType.Text, "0",
+					"z", SimpleBlok.FieldType.Text, "0",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"label", SimpleBlok.FieldType.Label, "to variable",
+					"end", SimpleBlok.FieldType.Text, "i",
+					"nel", SimpleBlok.FieldType.Newline, "",
+					"block", SimpleBlok.FieldType.ChildBlocks, SimpleBlok.createScript(),
+					),
+			},
 			Miscs: {
 				RunCommandAsPlayer: SimpleBlok.createBlock("command-asplayer",
 					"label", SimpleBlok.FieldType.Label, "Run command /",
@@ -132,7 +187,11 @@
 					"label", SimpleBlok.FieldType.Label, "Run command /",
 					"nel", SimpleBlok.FieldType.Text, "tellraw @a {\"text\": \"Hello everyone\"}",
 					"label", SimpleBlok.FieldType.Label, "as console",
-					)
+					),
+				RunScript: SimpleBlok.createBlock("script-run",
+					"label", SimpleBlok.FieldType.Label, "Run script",
+					"nel", SimpleBlok.FieldType.Text, "script.yml",
+					),
 			}
 		}
 
@@ -300,6 +359,74 @@
 				+ `${baseSpaces}  group: 'Commands'\n`
 				+ `${baseSpaces}  type: 'Console'\n`
 				+ `${baseSpaces}  command: ${block.fields[1].value}\n`;
+			} else if (block.id === 'entity-setVector') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Entity'\n`
+				+ `${baseSpaces}  type: 'Set Vector'\n`
+				+ `${baseSpaces}  x: ${block.fields[1].value}\n`
+				+ `${baseSpaces}  y: ${block.fields[2].value}\n`
+				+ `${baseSpaces}  z: ${block.fields[3].value}\n`;
+			} else if (block.id === 'loop-for-1') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Loop'\n`
+				+ `${baseSpaces}  type: 'For 1'\n`
+				+ `${baseSpaces}  start: ${block.fields[1].value}\n`
+				+ `${baseSpaces}  end: ${block.fields[3].value}\n`
+				+ `${baseSpaces}  variable: '${block.fields[5].value}'\n`
+				+ `${baseSpaces}  children:\n`;
+				Runtime.Temporary.YamlOutputSpaces += 4;
+				block.fields[7].value.blocks.forEach((b, i) => {
+					output += convertBlockToYaml(b, i);
+				});
+				Runtime.Temporary.YamlOutputSpaces -= 4;
+			} else if (block.id === 'loop-entities') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Loop'\n`
+				+ `${baseSpaces}  type: 'Entities 1'\n`
+				+ `${baseSpaces}  xrange: ${block.fields[1].value}\n`
+				+ `${baseSpaces}  yrange: ${block.fields[2].value}\n`
+				+ `${baseSpaces}  zrange: ${block.fields[3].value}\n`
+				+ `${baseSpaces}  variable: '${block.fields[6].value}'\n`
+				+ `${baseSpaces}  children:\n`;
+				Runtime.Temporary.YamlOutputSpaces += 4;
+				block.fields[8].value.blocks.forEach((b, i) => {
+					output += convertBlockToYaml(b, i);
+				});
+				Runtime.Temporary.YamlOutputSpaces -= 4;
+			} else if (block.id === 'loop-entitiesrange') {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Loop'\n`
+				+ `${baseSpaces}  type: 'Entities 1'\n`
+				+ `${baseSpaces}  x: ${block.fields[1].value}\n`
+				+ `${baseSpaces}  y: ${block.fields[2].value}\n`
+				+ `${baseSpaces}  z: ${block.fields[3].value}\n`
+				+ `${baseSpaces}  xrange: ${block.fields[6].value}\n`
+				+ `${baseSpaces}  yrange: ${block.fields[7].value}\n`
+				+ `${baseSpaces}  zrange: ${block.fields[8].value}\n`
+				+ `${baseSpaces}  variable: '${block.fields[11].value}'\n`
+				+ `${baseSpaces}  children:\n`;
+				Runtime.Temporary.YamlOutputSpaces += 4;
+				block.fields[13].value.blocks.forEach((b, i) => {
+					output += convertBlockToYaml(b, i);
+				});
+				Runtime.Temporary.YamlOutputSpaces -= 4;
+			} else if (block.id === "variables-setstringlocal") {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Script'\n`
+				+ `${baseSpaces}  type: 'Set'\n`;
+				+ `${baseSpaces}  path: '${block.fields[1].value}'\n`
+				+ `${baseSpaces}  value: ${block.fields[3].value}\n`;
+			} else if (block.id === "script-run") {
+				output += ``
+				+ `${baseSpaces}action-${index}:\n`
+				+ `${baseSpaces}  group: 'Script'\n`
+				+ `${baseSpaces}  type: 'Run'\n`
+				+ `${baseSpaces}  script: '${block.fields[1].value}'\n`;
 			}
 			if (block.id === "conditional-if-else") {
 				output += ``
