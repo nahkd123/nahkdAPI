@@ -2,7 +2,10 @@ package me.nahkd.spigot.api.placeholder;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import me.nahkd.spigot.api.debugger.Debug;
@@ -127,6 +130,12 @@ public class PlaceholderManager {
 		String out = parse(input, configRef);
 		out = parse(out, player);
 		return out;
+	}
+	
+	public static String parseWithEntity(String input, Entity entity, ConfigurationSection configRef) {
+		if (entity instanceof Player || entity instanceof HumanEntity) {
+			return parse(input, Bukkit.getPlayer(input), configRef);
+		} else return parse(input, configRef);
 	}
 	
 }

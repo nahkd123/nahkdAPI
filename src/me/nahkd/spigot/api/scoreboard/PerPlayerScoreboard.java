@@ -59,7 +59,7 @@ public class PerPlayerScoreboard {
 	public static void hideAllPlayers() {
 		for (Player player : getMap().keySet()) {
 			PerPlayerScoreboard scoreboard = getMap().get(player);
-			if (scoreboard.playerScoreboard != null && player.getScoreboard() != null) {
+			if (scoreboard != null) if (scoreboard.playerScoreboard != null && player.getScoreboard() != null) {
 				player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 			}
 			player.getScoreboard().clearSlot(DisplaySlot.SIDEBAR);

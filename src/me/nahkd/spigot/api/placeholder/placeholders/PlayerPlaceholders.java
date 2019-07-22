@@ -25,6 +25,10 @@ public class PlayerPlaceholders extends PlaceholderListener {
 			long disp = Math.round(((double) player.getExp()) * maxExp);
 			return disp + "";
 		}
+		else if (dataString.startsWith("has_permission(")) {
+			String permission = dataString.substring(15).replace(")", "");
+			return player.hasPermission(permission) + "";
+		}
 		return "§cUnknown";
 	}
 
